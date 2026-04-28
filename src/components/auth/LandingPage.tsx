@@ -12,12 +12,12 @@ interface LandingPageProps {
 
 const benefits = [
   {
-    description: 'Procesos unificados para tus facturas.',
+    description: 'Procesos unificados para tus pagos.',
     icon: Cog6ToothIcon,
     title: 'Ahorra tiempo',
   },
   {
-    description: 'Todas tus facturas y alianzas en un solo lugar.',
+    description: 'Todos tus pagos y alianzas en un solo lugar.',
     icon: Squares2X2Icon,
     title: 'Monitoreo unificado',
   },

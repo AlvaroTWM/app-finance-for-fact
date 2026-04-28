@@ -12,10 +12,12 @@ import { InvoiceTable } from './components/invoices/InvoiceTable'
 import { InvoicesMonitoringView } from './components/invoices/InvoicesMonitoringView'
 import { UploadForm } from './components/invoices/UploadForm'
 import { Navbar } from './components/layout/navbar'
+import { PaymentInstallmentPlanner } from './components/payments/PaymentInstallmentPlanner'
 import { useInvoices } from './hooks/useInvoices'
 import { useTempAuth } from './hooks/useTempAuth'
 import type { AuthUser } from './types/auth'
 import type { InvoiceFilter } from './types/invoice'
+import type { InstallmentPaymentItem } from './types/payment'
 
 type AppView = 'aliado' | 'alianzas'
 type PreLoginView = 'landing' | 'login'
@@ -69,6 +71,15 @@ function AuthenticatedApp({
   const pendingUserInvoices = userInvoices.filter((invoice) => invoice.estado === 'Pendiente')
   const verifiedUserInvoices = userInvoices.filter((invoice) => invoice.estado === 'Verificado')
   const userInvoiceAmount = userInvoices.reduce((total, invoice) => total + invoice.monto, 0)
+  const installmentPayments: InstallmentPaymentItem[] = pendingUserInvoices.map((invoice) => ({
+    amount: invoice.monto,
+    id: invoice.id,
+    label: `${invoice.comercio} · ${invoice.nro_factura}`,
+    month: new Intl.DateTimeFormat('es-PY', {
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date(invoice.fecha_subida)),
+  }))
   const dashboardStats = [
     {
       icon: DocumentTextIcon,
@@ -126,16 +137,16 @@ function AuthenticatedApp({
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-end">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.26em] text-emerald-800">
-                {activeView === 'aliado' ? 'Portal del Aliado' : 'Monitoreo de Facturas'}
+                {activeView === 'aliado' ? 'Portal del Aliado' : 'Monitoreo de Pagos'}
               </p>
               <h1 className="mt-4 max-w-3xl text-4xl font-black leading-tight tracking-normal text-slate-950 sm:text-5xl">
                 {activeView === 'aliado'
-                  ? 'Carga, controla y valida tus facturas en un solo lugar.'
-                  : 'Supervisa cada factura cargada por tus aliados.'}
+                  ? 'Carga evidencias y controla tus pagos pendientes en un solo lugar.'
+                  : 'Supervisa cada pago pendiente cargado para tus aliados.'}
               </h1>
               <p className="mt-4 max-w-2xl text-base font-medium leading-7 text-slate-600">
                 {activeView === 'aliado'
-                  ? 'Un flujo simple para subir comprobantes, revisar pendientes y mantener trazabilidad sin ruido.'
+                  ? 'Un flujo simple para subir evidencias, revisar pendientes y mantener trazabilidad sin ruido.'
                   : 'Filtros claros, estado visible y acciones rapidas para que el equipo de alianzas avance sin friccion.'}
               </p>
             </div>
@@ -188,15 +199,17 @@ function AuthenticatedApp({
               })}
             </section>
 
+            <PaymentInstallmentPlanner payments={installmentPayments} />
+
             <section className="grid gap-8 lg:grid-cols-[390px_minmax(0,1fr)]">
               <UploadForm aliadoId={user.id} isSubmitting={isSubmitting} onUpload={uploadInvoice} />
 
               <div className="animate-fade-up animate-delay-3 space-y-6 rounded-[2rem] border border-emerald-950/10 bg-white/80 p-6 shadow-[0_24px_60px_rgba(15,23,42,0.07)] backdrop-blur">
                 <div className="flex flex-col gap-4 border-b border-emerald-950/10 pb-5 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h2 className="text-2xl font-black text-slate-950">Mis facturas</h2>
+                    <h2 className="text-2xl font-black text-slate-950">Mis pagos</h2>
                     <p className="mt-1 text-sm font-medium text-slate-500">
-                      Revisa tus cargas recientes y el estado de validacion.
+                      Revisa tus evidencias recientes y el estado de validacion.
                     </p>
                   </div>
 

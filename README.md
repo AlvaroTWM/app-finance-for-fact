@@ -1,5 +1,63 @@
-# Finance App
-Project for fact loyalty.
+# Loyalty Pagos
+
+Aplicacion MERN para carga y monitoreo de pagos pendientes entre Aliados y Administradores de Alianzas.
+
+## Frontend
+
+```bash
+npm run dev
+```
+
+## Backend
+
+La base del backend vive en `server/` e incluye Express, TypeScript, modelos iniciales, health check y un modo seguro temporal sin MongoDB.
+
+Para instalar dependencias del backend:
+
+```bash
+npm install --prefix server
+```
+
+Configura variables:
+
+```bash
+cp server/.env.example server/.env
+```
+
+Levantar API:
+
+```bash
+npm run server:dev
+```
+
+Por defecto corre en modo seguro temporal:
+
+- Escucha solo en `127.0.0.1`.
+- No conecta MongoDB.
+- Guarda pagos en memoria.
+- No guarda imagenes en disco.
+- Valida imagenes con limite de 5MB y tipos `PNG`, `JPG`, `WEBP`.
+- Devuelve una URL placeholder para `url_imagen`.
+
+Health check:
+
+```bash
+GET http://127.0.0.1:3000/api/health
+```
+
+Modelos iniciales:
+
+- `User`: usuarios con roles `Aliado` o `Alianzas`.
+- `Invoice`: pagos con comercio, monto, evidencia, estado y aliado.
+- `Commerce`: catalogo simple de comercios.
+
+Endpoints temporales:
+
+- `GET /api/invoices`
+- `POST /api/invoices`
+- `PATCH /api/invoices/:invoiceId/verify`
+- `PATCH /api/invoices/:invoiceId/reject`
+- `POST /api/payments/import`
 
 # React + TypeScript + Vite
 

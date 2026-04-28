@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { InvoiceTable } from './InvoiceTable'
 import { Input } from '../ui/Input'
 import { Select } from '../ui/Select'
+import { PendingPaymentsImport } from '../payments/PendingPaymentsImport'
 import { invoiceStatuses } from '../../types/invoice'
 import type { Invoice, InvoiceStatus } from '../../types/invoice'
 
@@ -87,16 +88,18 @@ export function InvoicesMonitoringView({
 
   return (
     <section className="animate-fade-up animate-delay-2 space-y-6 rounded-[2rem] border border-emerald-950/10 bg-white/80 p-6 shadow-[0_24px_60px_rgba(15,23,42,0.07)] backdrop-blur">
+      <PendingPaymentsImport />
+
       <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-700">
             Vista de Alianzas
           </p>
           <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
-            Monitorea todas las facturas cargadas
+            Monitorea todos los pagos pendientes
           </h2>
           <p className="mt-2 text-sm font-medium text-slate-500">
-            Filtra por comercio, estado o fecha y toma accion sobre cada comprobante.
+            Filtra por comercio, estado o fecha y toma accion sobre cada evidencia.
           </p>
         </div>
 
@@ -127,7 +130,7 @@ export function InvoicesMonitoringView({
               Filtros
             </p>
             <p className="mt-1 text-sm font-medium text-slate-500">
-              Usa pocos filtros para encontrar rapido las facturas que requieren accion.
+              Usa pocos filtros para encontrar rapido los pagos que requieren accion.
             </p>
           </div>
           <p className="text-sm font-black text-slate-950">

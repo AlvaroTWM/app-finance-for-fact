@@ -75,7 +75,7 @@ export function LoginScreen({
           <div className="grid size-8 place-items-center rounded-lg border border-emerald-700/20 bg-white/60 shadow-sm">
             <span className="text-sm font-black">L</span>
           </div>
-          <span className="text-sm font-black tracking-[0.24em]">Loyalty Facturas</span>
+          <span className="text-sm font-black tracking-[0.24em]">Loyalty Pagos</span>
         </div>
 
         <button

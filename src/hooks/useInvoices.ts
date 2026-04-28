@@ -28,13 +28,13 @@ const defaultFilterByRole: Record<UserRole, InvoiceFilter> = {
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     if (error.message === 'Network Error') {
-      return 'No pudimos cargar tus facturas. Intenta nuevamente.'
+      return 'No pudimos cargar tus pagos. Intenta nuevamente.'
     }
 
     return error.message
   }
 
-  return 'Ocurrio un error inesperado al procesar las facturas.'
+  return 'Ocurrio un error inesperado al procesar los pagos.'
 }
 
 export function useInvoices({ role, userId }: UseInvoicesOptions) {

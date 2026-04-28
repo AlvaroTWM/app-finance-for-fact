@@ -19,12 +19,12 @@ interface NavbarProps {
 
 const navigation: NavigationItem[] = [
     {
-        description: 'Carga de facturas y seguimiento de tus envios',
+        description: 'Carga de evidencias y seguimiento de tus pagos',
         label: 'Portal Aliado',
         view: 'aliado',
     },
     {
-        description: 'Monitoreo general, filtros y verificacion',
+        description: 'Monitoreo general, pagos y verificacion',
         label: 'Monitoreo Alianzas',
         view: 'alianzas',
     },
@@ -53,7 +53,7 @@ export function Navbar({ activeView, onChangeView, onLogout, userName, userRole 
                         </div>
                         <div>
                             <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-700">Loyalty</p>
-                            <p className="text-lg font-black">Gestor de Facturas</p>
+                            <p className="text-lg font-black">Gestor de Pagos</p>
                         </div>
                     </div>
 

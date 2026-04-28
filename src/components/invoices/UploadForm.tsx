@@ -20,7 +20,7 @@ const commerceSuggestions = [
 ]
 
 const uploadSteps = [
-  'Factura',
+  'Pago',
   'Comercio',
   'Monto',
   'Evidencia',
@@ -89,7 +89,7 @@ export function UploadForm({
     setSuccessMessage(null)
 
     if (!invoiceNumber.trim()) {
-      setError('Ingresa un numero de factura valido.')
+      setError('Ingresa una referencia de pago valida.')
       return
     }
 
@@ -99,7 +99,7 @@ export function UploadForm({
     }
 
     if (!amount || Number(amount) <= 0) {
-      setError('Ingresa el monto total de la factura.')
+      setError('Ingresa el monto total del pago.')
       return
     }
 
@@ -118,13 +118,13 @@ export function UploadForm({
       })
 
       resetForm()
-      setSuccessMessage('Factura enviada a validacion. El equipo de alianzas la revisara pronto.')
+      setSuccessMessage('Evidencia enviada a validacion. El equipo de alianzas la revisara pronto.')
     } catch (submitError) {
       const message = submitError instanceof Error ? submitError.message : ''
       setError(
-        message === 'No pudimos cargar tus facturas. Intenta nuevamente.'
-          ? 'No pudimos enviar tu factura. Intenta nuevamente.'
-          : message || 'No pudimos enviar tu factura. Intenta nuevamente.',
+        message === 'No pudimos cargar tus pagos. Intenta nuevamente.'
+          ? 'No pudimos enviar tu evidencia de pago. Intenta nuevamente.'
+          : message || 'No pudimos enviar tu evidencia de pago. Intenta nuevamente.',
       )
     }
   }
@@ -136,7 +136,7 @@ export function UploadForm({
     >
       <div className="border-b border-emerald-950/10 pb-5">
         <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-700">
-          Carga de Factura
+          Carga de evidencia
         </p>
         <h2 className="mt-3 text-2xl font-black tracking-normal text-slate-950">
           Adjunta tu evidencia de pago
@@ -167,9 +167,9 @@ export function UploadForm({
           <Input
             className="mt-1"
             id="invoiceNumber"
-            label="Numero de factura"
+            label="Referencia de pago"
             onChange={(event) => setInvoiceNumber(event.target.value)}
-            placeholder="Ej: FAC-000123"
+            placeholder="Ej: PAG-000123"
             value={invoiceNumber}
           />
         </div>
@@ -218,7 +218,7 @@ export function UploadForm({
           <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
             Paso 4
           </p>
-          <p className="mt-2 text-sm font-bold text-slate-700">Imagen de la factura</p>
+          <p className="mt-2 text-sm font-bold text-slate-700">Evidencia de pago</p>
           <label
             htmlFor="invoiceFile"
             onDragLeave={() => setIsDragging(false)}
@@ -234,7 +234,7 @@ export function UploadForm({
           >
             {previewUrl ? (
               <img
-                alt="Vista previa de la factura"
+                alt="Vista previa de la evidencia de pago"
                 className="max-h-44 rounded-2xl object-contain shadow-[0_18px_44px_rgba(15,23,42,0.12)]"
                 src={previewUrl}
               />
@@ -247,7 +247,7 @@ export function UploadForm({
                   Arrastra la imagen o haz click para seleccionar
                 </span>
                 <span className="mt-1 text-xs font-medium text-slate-500">
-                  PNG, JPG o WEBP. Procura que numero y monto sean legibles.
+                  PNG, JPG o WEBP. Procura que referencia y monto sean legibles.
                 </span>
               </>
             )}

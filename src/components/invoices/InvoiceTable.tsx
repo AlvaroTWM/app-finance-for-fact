@@ -67,7 +67,7 @@ export function InvoiceTable({
   if (isLoading) {
     return (
       <div className="animate-soft-pop rounded-2xl border border-dashed border-emerald-950/15 bg-emerald-50/45 px-6 py-14 text-center text-sm font-medium text-slate-500">
-        Preparando tus facturas...
+        Preparando tus pagos...
       </div>
     )
   }
@@ -81,12 +81,12 @@ export function InvoiceTable({
           <InboxIcon aria-hidden="true" className="size-6" />
         </div>
         <p className="mt-4 text-base font-black text-slate-950">
-          {isAlianzasView ? 'Aun no hay facturas cargadas' : 'Subi tu primera factura'}
+          {isAlianzasView ? 'Aun no hay pagos cargados' : 'Subi tu primera evidencia'}
         </p>
         <p className="mx-auto mt-2 max-w-sm text-sm font-medium leading-6 text-slate-500">
           {isAlianzasView
-            ? 'Cuando los aliados carguen comprobantes, apareceran aca para aprobarlos o rechazarlos.'
-            : 'Carga un comprobante para enviarlo a validacion y hacer seguimiento desde este panel.'}
+            ? 'Cuando los aliados carguen evidencias, apareceran aca para aprobarlas o rechazarlas.'
+            : 'Carga una evidencia de pago para enviarla a validacion y hacer seguimiento desde este panel.'}
         </p>
         {isAlianzasView ? (
           <span className="mt-5 inline-flex rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-800 shadow-sm">
@@ -94,7 +94,7 @@ export function InvoiceTable({
           </span>
         ) : (
           <Button className="interactive-lift mt-5" onClick={onEmptyAction}>
-            Subi tu primera factura
+            Subi tu primera evidencia
           </Button>
         )}
       </div>
@@ -111,7 +111,7 @@ export function InvoiceTable({
               <th className="px-4 py-3 font-medium">Monto</th>
               <th className="px-4 py-3 font-medium">Estado</th>
               <th className="px-4 py-3 font-medium">Fecha</th>
-              <th className="px-4 py-3 font-medium">Factura</th>
+              <th className="px-4 py-3 font-medium">Referencia</th>
               <th className="px-4 py-3 font-medium">Imagen</th>
               <th className="px-4 py-3 font-medium">Acciones</th>
             </tr>
