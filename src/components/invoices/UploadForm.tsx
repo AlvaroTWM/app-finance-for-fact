@@ -139,7 +139,7 @@ export function UploadForm({
           Carga de Factura
         </p>
         <h2 className="mt-3 text-2xl font-black tracking-normal text-slate-950">
-          Adjunta tu evidencia de compra
+          Adjunta tu evidencia de pago
         </h2>
         <p className="mt-2 text-sm font-medium leading-6 text-slate-500">
           Completa los pasos y adjunta una imagen legible para enviarla a validacion.
@@ -227,11 +227,10 @@ export function UploadForm({
               setIsDragging(true)
             }}
             onDrop={handleDrop}
-            className={`mt-3 flex cursor-pointer flex-col items-center justify-center rounded-3xl border border-dashed px-4 py-6 text-center transition ${
-              isDragging
+            className={`mt-3 flex cursor-pointer flex-col items-center justify-center rounded-3xl border border-dashed px-4 py-6 text-center transition ${isDragging
                 ? 'border-emerald-500 bg-emerald-50'
                 : 'border-emerald-950/20 bg-emerald-50/40 hover:border-emerald-400 hover:bg-emerald-50/80'
-            }`}
+              }`}
           >
             {previewUrl ? (
               <img

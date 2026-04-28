@@ -1,4 +1,5 @@
 import {
+  ArrowLeftIcon,
   ChevronDownIcon,
   EnvelopeIcon,
   EyeIcon,
@@ -15,6 +16,7 @@ interface LoginScreenProps {
   demoAccounts: DemoAccount[]
   error?: string | null
   isSubmitting?: boolean
+  onBackToLanding: () => void
   onLogin: (credentials: LoginCredentials) => Promise<unknown>
 }
 
@@ -24,6 +26,7 @@ export function LoginScreen({
   demoAccounts,
   error = null,
   isSubmitting = false,
+  onBackToLanding,
   onLogin,
 }: LoginScreenProps) {
   const defaultAccount =
@@ -74,6 +77,16 @@ export function LoginScreen({
           </div>
           <span className="text-sm font-black tracking-[0.24em]">Loyalty Facturas</span>
         </div>
+
+        <button
+          type="button"
+          onClick={onBackToLanding}
+          className="interactive-lift inline-flex items-center gap-2 rounded-full bg-white/65 px-4 py-2 text-sm font-bold text-slate-700 shadow-sm hover:bg-white hover:text-slate-950"
+        >
+          <ArrowLeftIcon aria-hidden="true" className="size-4" />
+          <span className="hidden sm:inline">Volver al inicio</span>
+          <span className="sm:hidden">Inicio</span>
+        </button>
       </header>
 
       <section className="login-panel relative z-10 mx-auto flex flex-1 flex-col justify-center py-10 sm:py-12">

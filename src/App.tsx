@@ -263,6 +263,11 @@ function App() {
     user,
   } = useTempAuth()
 
+  const handleLogout = () => {
+    logout()
+    setPreLoginView('landing')
+  }
+
   if (!isAuthenticated || !user) {
     if (preLoginView === 'landing') {
       return (
@@ -278,12 +283,13 @@ function App() {
         demoAccounts={demoAccounts}
         error={error}
         isSubmitting={isSubmitting}
+        onBackToLanding={() => setPreLoginView('landing')}
         onLogin={login}
       />
     )
   }
 
-  return <AuthenticatedApp onLogout={logout} user={user} />
+  return <AuthenticatedApp onLogout={handleLogout} user={user} />
 }
 
 export default App
