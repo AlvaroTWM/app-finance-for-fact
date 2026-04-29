@@ -8,7 +8,7 @@ import type {
 } from '../types/invoice'
 
 const invoicesApi = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3000/api',
+  baseURL: import.meta.env.VITE_API_URL ?? '/api',
 })
 
 export async function getInvoices(): Promise<Invoice[]> {
@@ -17,21 +17,13 @@ export async function getInvoices(): Promise<Invoice[]> {
 }
 
 export async function createInvoice(payload: UploadInvoicePayload): Promise<Invoice> {
-  const formData = new FormData()
-
-  formData.append('nro_factura', payload.nro_factura)
-  formData.append('comercio', payload.comercio)
-  formData.append('aliado_id', payload.aliado_id)
-  formData.append('imagen', payload.imagen)
-
-  if (typeof payload.monto === 'number') {
-    formData.append('monto', String(payload.monto))
-  }
-
-  const response = await invoicesApi.post<Invoice>('/invoices', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
+  const response = await invoicesApi.post<Invoice>('/invoices', {
+    aliado_id: payload.aliado_id,
+    comercio: payload.comercio,
+    imagen_nombre: payload.imagen.name,
+    imagen_tipo: payload.imagen.type,
+    monto: payload.monto,
+    nro_factura: payload.nro_factura,
   })
 
   return response.data

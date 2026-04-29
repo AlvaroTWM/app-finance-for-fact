@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:api": "tsc -p tsconfig.api.json",
     "lint": "eslint .",
     "preview": "vite preview",
     "server:build": "npm run build --prefix server",
@@ -16,6 +17,7 @@
     "@headlessui/react": "^2.2.10",
     "@heroicons/react": "^2.2.0",
     "axios": "^1.15.0",
+    "mongoose": "^9.0.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },

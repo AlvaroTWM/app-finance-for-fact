@@ -63,13 +63,35 @@ Endpoints temporales:
 
 ### Frontend en Vercel
 
-En Vercel, agrega esta variable en `Project Settings > Environment Variables`:
+Como ahora usamos Vercel Functions en el mismo proyecto, puedes dejar el frontend apuntando a la API del mismo dominio:
 
 ```bash
-VITE_API_URL=https://URL-DE-TU-BACKEND/api
+VITE_API_URL=/api
+```
+
+Tambien puedes omitir `VITE_API_URL`, porque el frontend usa `/api` por defecto.
+
+Agrega estas variables secretas en `Project Settings > Environment Variables`:
+
+```bash
+MONGODB_URI=mongodb+srv://loyalty_app_user:<URL_ENCODED_PASSWORD>@loyalty-pagos-dev.n3peaqd.mongodb.net/loyalty_pagos?retryWrites=true&w=majority&appName=loyalty-pagos-dev
+CLIENT_ORIGINS=https://julianxloyalty.vercel.app,http://127.0.0.1:5173,http://localhost:5173
 ```
 
 No uses `http://127.0.0.1:3000/api` en Vercel, porque esa URL solo funciona en tu computadora.
+
+### API en Vercel Functions
+
+La carpeta `api/` contiene endpoints serverless para la demo:
+
+- `GET /api/health`
+- `GET /api/invoices`
+- `POST /api/invoices`
+- `PATCH /api/invoices/:invoiceId/verify`
+- `PATCH /api/invoices/:invoiceId/reject`
+- `POST /api/payments/import`
+
+En esta demo las evidencias y archivos Excel no se almacenan; se guarda metadata y una URL placeholder.
 
 ### Backend
 
