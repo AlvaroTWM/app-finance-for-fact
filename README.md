@@ -59,6 +59,37 @@ Endpoints temporales:
 - `PATCH /api/invoices/:invoiceId/reject`
 - `POST /api/payments/import`
 
+## Variables Para Deploy
+
+### Frontend en Vercel
+
+En Vercel, agrega esta variable en `Project Settings > Environment Variables`:
+
+```bash
+VITE_API_URL=https://URL-DE-TU-BACKEND/api
+```
+
+No uses `http://127.0.0.1:3000/api` en Vercel, porque esa URL solo funciona en tu computadora.
+
+### Backend
+
+Cuando el backend este deployado, usa variables como estas:
+
+```bash
+PORT=3000
+HOST=0.0.0.0
+USE_MOCK_DB=false
+MONGODB_URI=mongodb+srv://loyalty_app_user:<URL_ENCODED_PASSWORD>@loyalty-pagos-dev.n3peaqd.mongodb.net/loyalty_pagos?retryWrites=true&w=majority&appName=loyalty-pagos-dev
+CLIENT_ORIGINS=https://julianxloyalty.vercel.app,http://127.0.0.1:5173,http://localhost:5173
+```
+
+En local puedes mantener:
+
+```bash
+HOST=127.0.0.1
+VITE_API_URL=http://127.0.0.1:3000/api
+```
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
