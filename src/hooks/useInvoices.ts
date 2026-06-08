@@ -1,29 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
-  createInvoice as createInvoiceRequest,
   getInvoices,
   rejectInvoiceById,
   verifyInvoiceById,
 } from '../services/invoices'
-import type {
-  Invoice,
-  InvoiceFilter,
-  RejectInvoicePayload,
-  UploadInvoicePayload,
-  UserRole,
-  VerifyInvoicePayload,
-} from '../types/invoice'
-
-interface UseInvoicesOptions {
-  role: UserRole
-  userId: string
-}
-
-const defaultFilterByRole: Record<UserRole, InvoiceFilter> = {
-  Aliado: 'mine',
-  Alianzas: 'pending',
-}
+import type { Invoice, RejectInvoicePayload, VerifyInvoicePayload } from '../types/invoice'
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
@@ -37,11 +19,9 @@ function getErrorMessage(error: unknown): string {
   return 'Ocurrio un error inesperado al procesar los pagos.'
 }
 
-export function useInvoices({ role, userId }: UseInvoicesOptions) {
+export function useInvoices() {
   const [invoices, setInvoices] = useState<Invoice[]>([])
-  const [filter, setFilter] = useState<InvoiceFilter>(defaultFilterByRole[role])
   const [isLoading, setIsLoading] = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const fetchInvoices = async () => {
@@ -89,37 +69,7 @@ export function useInvoices({ role, userId }: UseInvoicesOptions) {
     }
   }, [])
 
-  const filteredInvoices = useMemo(() => {
-    switch (filter) {
-      case 'pending':
-        return invoices.filter((invoice) => invoice.estado === 'Pendiente')
-      case 'mine':
-        return invoices.filter((invoice) => invoice.aliado_id === userId)
-      case 'all':
-      default:
-        return invoices
-    }
-  }, [filter, invoices, userId])
-
-  const uploadInvoice = async (payload: UploadInvoicePayload) => {
-    setIsSubmitting(true)
-    setError(null)
-
-    try {
-      const createdInvoice = await createInvoiceRequest(payload)
-      setInvoices((currentInvoices) => [createdInvoice, ...currentInvoices])
-      return createdInvoice
-    } catch (submitError) {
-      const message = getErrorMessage(submitError)
-      setError(message)
-      throw new Error(message)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
   const verifyInvoice = async (invoiceId: string, payload?: VerifyInvoicePayload) => {
-    setIsSubmitting(true)
     setError(null)
 
     try {
@@ -135,13 +85,10 @@ export function useInvoices({ role, userId }: UseInvoicesOptions) {
       const message = getErrorMessage(submitError)
       setError(message)
       throw new Error(message)
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
   const rejectInvoice = async (invoiceId: string, payload?: RejectInvoicePayload) => {
-    setIsSubmitting(true)
     setError(null)
 
     try {
@@ -157,21 +104,14 @@ export function useInvoices({ role, userId }: UseInvoicesOptions) {
       const message = getErrorMessage(submitError)
       setError(message)
       throw new Error(message)
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
   return {
     error,
-    filter,
-    filteredInvoices,
     invoices,
     isLoading,
-    isSubmitting,
     rejectInvoice,
-    setFilter,
-    uploadInvoice,
     verifyInvoice,
     refetch: fetchInvoices,
   }

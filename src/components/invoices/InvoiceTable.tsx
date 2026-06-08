@@ -2,15 +2,13 @@ import { useState } from 'react'
 import { InboxIcon } from '@heroicons/react/24/outline'
 
 import { Button } from '../ui/Button'
-import type { Invoice, UserRole } from '../../types/invoice'
+import type { Invoice } from '../../types/invoice'
 
 interface InvoiceTableProps {
   invoices: Invoice[]
   isLoading?: boolean
-  onEmptyAction?: () => void
   onReject?: (invoiceId: string) => Promise<Invoice>
   onVerify?: (invoiceId: string) => Promise<Invoice>
-  userRole: UserRole
 }
 
 function formatCurrency(amount: number) {
@@ -30,10 +28,8 @@ function formatDate(date: string) {
 export function InvoiceTable({
   invoices,
   isLoading = false,
-  onEmptyAction,
   onReject,
   onVerify,
-  userRole,
 }: InvoiceTableProps) {
   const [verifyingId, setVerifyingId] = useState<string | null>(null)
   const [rejectingId, setRejectingId] = useState<string | null>(null)
@@ -73,30 +69,19 @@ export function InvoiceTable({
   }
 
   if (invoices.length === 0) {
-    const isAlianzasView = userRole === 'Alianzas'
-
     return (
       <div className="animate-soft-pop rounded-2xl border border-dashed border-emerald-950/15 bg-emerald-50/45 px-6 py-14 text-center">
         <div className="mx-auto grid size-12 place-items-center rounded-full bg-white text-emerald-900 shadow-sm">
           <InboxIcon aria-hidden="true" className="size-6" />
         </div>
-        <p className="mt-4 text-base font-black text-slate-950">
-          {isAlianzasView ? 'Aun no hay pagos cargados' : 'Subi tu primera evidencia'}
-        </p>
+        <p className="mt-4 text-base font-black text-slate-950">Aun no hay pagos cargados</p>
         <p className="mx-auto mt-2 max-w-sm text-sm font-medium leading-6 text-slate-500">
-          {isAlianzasView
-            ? 'Cuando los aliados carguen evidencias, apareceran aca para aprobarlas o rechazarlas.'
-            : 'Carga una evidencia de pago para enviarla a validacion y hacer seguimiento desde este panel.'}
+          Cuando se registren evidencias, apareceran aca para que el equipo pueda aprobarlas o
+          rechazarlas.
         </p>
-        {isAlianzasView ? (
-          <span className="mt-5 inline-flex rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-800 shadow-sm">
-            Esperando carga de aliados
-          </span>
-        ) : (
-          <Button className="interactive-lift mt-5" onClick={onEmptyAction}>
-            Subi tu primera evidencia
-          </Button>
-        )}
+        <span className="mt-5 inline-flex rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-800 shadow-sm">
+          Esperando nuevas evidencias
+        </span>
       </div>
     )
   }
@@ -118,10 +103,8 @@ export function InvoiceTable({
           </thead>
           <tbody className="divide-y divide-slate-200 bg-white text-slate-700">
             {invoices.map((invoice, index) => {
-              const canVerify =
-                userRole === 'Alianzas' && invoice.estado === 'Pendiente' && Boolean(onVerify)
-              const canReject =
-                userRole === 'Alianzas' && invoice.estado === 'Pendiente' && Boolean(onReject)
+              const canVerify = invoice.estado === 'Pendiente' && Boolean(onVerify)
+              const canReject = invoice.estado === 'Pendiente' && Boolean(onReject)
               const delayClass =
                 index % 3 === 0
                   ? 'animate-delay-1'
@@ -133,7 +116,7 @@ export function InvoiceTable({
                 <tr key={invoice.id} className={`animate-fade-up ${delayClass}`}>
                   <td className="px-4 py-4">
                     <p className="font-black text-slate-950">{invoice.comercio}</p>
-                    <p className="mt-1 text-xs text-slate-400">Aliado: {invoice.aliado_id}</p>
+                    <p className="mt-1 text-xs text-slate-400">Referencia: {invoice.aliado_id}</p>
                   </td>
                   <td className="px-4 py-4">{formatCurrency(invoice.monto)}</td>
                   <td className="px-4 py-4">

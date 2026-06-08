@@ -4,14 +4,6 @@ export interface AuthUser {
   email: string
   id: string
   name: string
+  picture?: string
   role: UserRole
-}
-
-export interface LoginCredentials {
-  identifier: string
-  password: string
-}
-
-export interface DemoAccount extends AuthUser {
-  password: string
 }

@@ -1,36 +1,22 @@
-import { useState } from 'react'
 import {
   BanknotesIcon,
   CheckCircleIcon,
   ClockIcon,
   DocumentTextIcon,
 } from '@heroicons/react/24/outline'
+import { useState } from 'react'
 
+import { AllyDetailPage } from './components/allies/AllyDetailPage'
+import { AlliesPaymentsView } from './components/allies/AlliesPaymentsView'
 import { LandingPage } from './components/auth/LandingPage'
 import { LoginScreen } from './components/auth/LoginScreen'
-import { InvoiceTable } from './components/invoices/InvoiceTable'
-import { InvoicesMonitoringView } from './components/invoices/InvoicesMonitoringView'
-import { UploadForm } from './components/invoices/UploadForm'
 import { Navbar } from './components/layout/navbar'
-import { PaymentInstallmentPlanner } from './components/payments/PaymentInstallmentPlanner'
-import { useInvoices } from './hooks/useInvoices'
-import { useTempAuth } from './hooks/useTempAuth'
+import { useAllies } from './hooks/useAllies'
+import { useDarkMode } from './hooks/useDarkMode'
+import { useSessionContext } from './hooks/useSessionContext'
 import type { AuthUser } from './types/auth'
-import type { InvoiceFilter } from './types/invoice'
-import type { InstallmentPaymentItem } from './types/payment'
 
-type AppView = 'aliado' | 'alianzas'
-type PreLoginView = 'landing' | 'login'
-
-const filterLabels: Record<InvoiceFilter, string> = {
-  all: 'Todas',
-  mine: 'Subidas por mi',
-  pending: 'Pendientes',
-}
-
-function getDefaultView(user: AuthUser): AppView {
-  return user.role === 'Alianzas' ? 'alianzas' : 'aliado'
-}
+type AuthView = 'landing' | 'login' | 'session'
 
 function formatCompactCurrency(amount: number) {
   return new Intl.NumberFormat('es-PY', {
@@ -41,6 +27,32 @@ function formatCompactCurrency(amount: number) {
   }).format(amount)
 }
 
+function SessionGate({
+  error,
+  isLoading,
+}: {
+  error: string | null
+  isLoading: boolean
+}) {
+  return (
+    <main className="app-shell grid min-h-screen place-items-center px-5 py-8 text-slate-950">
+      <section className="surface-shine w-full max-w-xl rounded-[2rem] border border-emerald-950/10 bg-white/85 p-8 text-center shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur">
+        <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">
+          Loyalty Pagos
+        </p>
+        <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-950">
+          {isLoading ? 'Validando acceso corporativo' : 'Acceso restringido'}
+        </h1>
+        <p className="mt-4 text-base leading-7 text-slate-600">
+          {isLoading
+            ? 'Estamos comprobando tu sesion de Google dentro del entorno de Apps Script.'
+            : error || 'No pudimos validar tu acceso a esta aplicacion.'}
+        </p>
+      </section>
+    </main>
+  )
+}
+
 function AuthenticatedApp({
   onLogout,
   user,
@@ -48,261 +60,230 @@ function AuthenticatedApp({
   onLogout: () => void
   user: AuthUser
 }) {
-  const [activeView, setActiveView] = useState<AppView>(getDefaultView(user))
-
+  const { isDark, toggle: toggleDark } = useDarkMode()
   const {
+    addCuota,
+    allies,
+    createAgreement,
     error,
-    filteredInvoices,
-    filter,
-    invoices,
+    isDetailLoading,
     isLoading,
-    isSubmitting,
-    rejectInvoice,
-    setFilter,
-    uploadInvoice,
-    verifyInvoice,
-  } = useInvoices({
-    role: user.role,
-    userId: user.id,
-  })
+    registerPayment,
+    refetch,
+    selectedAllyDetail,
+    selectedAllyId,
+    selectAlly,
+  } = useAllies()
 
-  const availableFilters: InvoiceFilter[] = ['mine', 'all']
-  const userInvoices = invoices.filter((invoice) => invoice.aliado_id === user.id)
-  const pendingUserInvoices = userInvoices.filter((invoice) => invoice.estado === 'Pendiente')
-  const verifiedUserInvoices = userInvoices.filter((invoice) => invoice.estado === 'Verificado')
-  const userInvoiceAmount = userInvoices.reduce((total, invoice) => total + invoice.monto, 0)
-  const installmentPayments: InstallmentPaymentItem[] = pendingUserInvoices.map((invoice) => ({
-    amount: invoice.monto,
-    id: invoice.id,
-    label: `${invoice.comercio} · ${invoice.nro_factura}`,
-    month: new Intl.DateTimeFormat('es-PY', {
-      month: 'long',
-      year: 'numeric',
-    }).format(new Date(invoice.fecha_subida)),
-  }))
+  const [appView, setAppView] = useState<'list' | 'detail'>('list')
+
+  const handleSelectAlly = async (allyId: string | number) => {
+    await selectAlly(allyId)
+    setAppView('detail')
+  }
+
+  const handleBackToList = () => {
+    setAppView('list')
+  }
+
+  const pendingAllies = allies.filter((ally) => ally.estado_general === 'pendiente')
+  const partialAllies = allies.filter((ally) => ally.estado_general === 'parcial')
+  const totalOutstandingBalance = allies.reduce((total, ally) => total + ally.saldo_pendiente, 0)
   const dashboardStats = [
     {
       icon: DocumentTextIcon,
-      label: 'Cargadas',
-      value: String(userInvoices.length),
+      label: 'Aliados',
+      value: String(allies.length),
     },
     {
       icon: ClockIcon,
       label: 'Pendientes',
-      value: String(pendingUserInvoices.length),
+      value: String(pendingAllies.length),
     },
     {
       icon: CheckCircleIcon,
-      label: 'Verificadas',
-      value: String(verifiedUserInvoices.length),
+      label: 'Parciales',
+      value: String(partialAllies.length),
     },
     {
       icon: BanknotesIcon,
-      label: 'Monto total',
-      value: formatCompactCurrency(userInvoiceAmount),
+      label: 'Saldo pendiente',
+      value: formatCompactCurrency(totalOutstandingBalance),
     },
   ]
 
-  const handleChangeView = (view: AppView) => {
-    if (user.role === 'Aliado' && view !== 'aliado') {
-      return
-    }
-
-    if (user.role === 'Alianzas' && view !== 'alianzas') {
-      return
-    }
-
-    setActiveView(view)
-    setFilter(view === 'aliado' ? 'mine' : 'all')
-  }
-
-  const handleScrollToUpload = () => {
-    document
-      .getElementById('upload-invoice-form')
-      ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
   return (
-    <main className="app-shell min-h-screen py-8 text-slate-900 sm:py-10">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:px-8">
-        <Navbar
-          activeView={activeView}
-          onChangeView={handleChangeView}
-          onLogout={onLogout}
-          userName={user.name}
-          userRole={user.role}
-        />
+    <main className="app-shell min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+      {/* Navbar sticky */}
+      <div className="sticky top-0 z-30 bg-white dark:bg-slate-900">
+        <Navbar isDark={isDark} onLogout={onLogout} onToggleDark={toggleDark} userName={user.name} userRole={user.role} />
+      </div>
 
-        <section className="surface-shine animate-fade-up animate-delay-1 overflow-hidden rounded-[2rem] border border-emerald-950/10 bg-white/78 px-6 py-7 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur sm:px-8">
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-end">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.26em] text-emerald-800">
-                {activeView === 'aliado' ? 'Portal del Aliado' : 'Monitoreo de Pagos'}
-              </p>
-              <h1 className="mt-4 max-w-3xl text-4xl font-black leading-tight tracking-normal text-slate-950 sm:text-5xl">
-                {activeView === 'aliado'
-                  ? 'Carga evidencias y controla tus pagos pendientes en un solo lugar.'
-                  : 'Supervisa cada pago pendiente cargado para tus aliados.'}
-              </h1>
-              <p className="mt-4 max-w-2xl text-base font-medium leading-7 text-slate-600">
-                {activeView === 'aliado'
-                  ? 'Un flujo simple para subir evidencias, revisar pendientes y mantener trazabilidad sin ruido.'
-                  : 'Filtros claros, estado visible y acciones rapidas para que el equipo de alianzas avance sin friccion.'}
-              </p>
+      <div className="mx-auto flex w-full max-w-[92vw] flex-col gap-5 px-2 py-6">
+
+        {/* Hero compacto + stats — solo en la vista lista */}
+        {appView !== 'detail' && <section className="animate-fade-up animate-delay-1 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white px-6 py-5 shadow-sm dark:border-slate-700 dark:bg-slate-900 lg:flex-row lg:items-center lg:justify-between">
+          {/* Texto */}
+          <div className="flex-1">
+            <p className="text-[11px] font-black uppercase tracking-[0.26em] text-emerald-700 dark:text-emerald-400">
+              Panel operativo
+            </p>
+            <h1 className="mt-1 text-2xl font-black leading-tight text-slate-950 dark:text-white sm:text-3xl">
+              Centraliza el seguimiento de deuda, cuotas y pagos de tus aliados.
+            </h1>
+            <p className="mt-1.5 text-sm font-medium text-slate-500 dark:text-slate-400">
+              Todo el equipo puede entrar al detalle de cada aliado desde una sola vista y ver el saldo real sin depender del caos manual.
+            </p>
+          </div>
+
+          {/* Stats inline */}
+          <div className="flex shrink-0 flex-wrap gap-3 lg:flex-nowrap">
+            {dashboardStats.map((stat) => {
+              const Icon = stat.icon
+              return (
+                <div
+                  key={stat.label}
+                  className="flex min-w-[130px] items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800"
+                >
+                  <div className="grid size-9 shrink-0 place-items-center rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-400">
+                    <Icon aria-hidden="true" className="size-4" />
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500">{stat.label}</p>
+                    <p className="text-lg font-black text-slate-950 dark:text-white">{stat.value}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Sesion activa compacta */}
+          <div className="flex shrink-0 items-center gap-3 rounded-xl border border-slate-100 bg-emerald-50/60 px-4 py-3 dark:border-slate-700 dark:bg-emerald-900/20">
+            <div className="grid size-9 place-items-center rounded-full bg-emerald-500 text-sm font-black text-white">
+              {user.name.charAt(0).toUpperCase()}
             </div>
-
-            <div className="interactive-lift rounded-2xl border border-emerald-950/10 bg-emerald-50/70 p-4">
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">
-                Sesion activa
-              </p>
-              <div className="mt-4 flex items-center gap-3">
-                <div className="grid size-12 place-items-center rounded-full bg-emerald-500 text-base font-black text-emerald-950">
-                  {user.name.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-slate-500">{user.role}</p>
-                  <p className="text-lg font-black text-slate-950">{user.name}</p>
-                </div>
-              </div>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">{user.role}</p>
+              <p className="text-sm font-black text-slate-950 dark:text-white">{user.name}</p>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500">{user.email}</p>
             </div>
           </div>
-        </section>
+          </section>}
 
-        {activeView === 'aliado' ? (
-          <>
-            <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {dashboardStats.map((stat, index) => {
-                const Icon = stat.icon
-                const delayClass = [
-                  'animate-delay-2',
-                  'animate-delay-3',
-                  'animate-delay-4',
-                  'animate-delay-5',
-                ][index]
-
-                return (
-                  <article
-                    key={stat.label}
-                    className={`surface-shine interactive-lift animate-soft-pop ${delayClass} rounded-2xl border border-emerald-950/10 bg-white/76 p-5 shadow-[0_18px_44px_rgba(15,23,42,0.06)] backdrop-blur`}
-                  >
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <p className="text-sm font-semibold text-slate-500">{stat.label}</p>
-                        <p className="mt-2 text-2xl font-black text-slate-950">{stat.value}</p>
-                      </div>
-                      <div className="grid size-11 place-items-center rounded-full bg-emerald-50 text-emerald-900">
-                        <Icon aria-hidden="true" className="size-5" />
-                      </div>
-                    </div>
-                  </article>
-                )
-              })}
-            </section>
-
-            <PaymentInstallmentPlanner payments={installmentPayments} />
-
-            <section className="grid gap-8 lg:grid-cols-[390px_minmax(0,1fr)]">
-              <UploadForm aliadoId={user.id} isSubmitting={isSubmitting} onUpload={uploadInvoice} />
-
-              <div className="animate-fade-up animate-delay-3 space-y-6 rounded-[2rem] border border-emerald-950/10 bg-white/80 p-6 shadow-[0_24px_60px_rgba(15,23,42,0.07)] backdrop-blur">
-                <div className="flex flex-col gap-4 border-b border-emerald-950/10 pb-5 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <h2 className="text-2xl font-black text-slate-950">Mis pagos</h2>
-                    <p className="mt-1 text-sm font-medium text-slate-500">
-                      Revisa tus evidencias recientes y el estado de validacion.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 rounded-full bg-slate-100 p-1">
-                    {availableFilters.map((option) => {
-                      const isActive = filter === option
-
-                      return (
-                        <button
-                          key={option}
-                          type="button"
-                          onClick={() => setFilter(option)}
-                          className={`interactive-lift rounded-full px-4 py-2 text-sm font-bold ${
-                            isActive
-                              ? 'bg-emerald-500 text-emerald-950 shadow-sm'
-                              : 'text-slate-500 hover:text-slate-950'
-                          }`}
-                        >
-                          {filterLabels[option]}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                {error ? (
-                  <div className="animate-soft-pop rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">
-                    {error}
-                  </div>
-                ) : null}
-
-                <InvoiceTable
-                  invoices={filteredInvoices}
-                  isLoading={isLoading}
-                  onEmptyAction={handleScrollToUpload}
-                  userRole={user.role}
-                />
-              </div>
-            </section>
-          </>
+        {/* Vista condicional: lista o detalle */}
+        {appView === 'detail' && selectedAllyDetail ? (
+          <AllyDetailPage
+            allyDetail={selectedAllyDetail}
+            isLoading={isDetailLoading}
+            onAddCuota={addCuota}
+            onBack={handleBackToList}
+            onRegisterPayment={registerPayment}
+          />
         ) : (
-          <InvoicesMonitoringView
+          <AlliesPaymentsView
+            allies={allies}
             error={error}
-            invoices={invoices}
+            isDetailLoading={isDetailLoading}
             isLoading={isLoading}
-            onReject={rejectInvoice}
-            onVerify={verifyInvoice}
+            onAddCuota={addCuota}
+            onCreateAgreement={createAgreement}
+            onRegisterPayment={registerPayment}
+            onRefresh={refetch}
+            onSelectAlly={handleSelectAlly}
+            selectedAllyDetail={selectedAllyDetail}
+            selectedAllyId={selectedAllyId}
           />
         )}
+
       </div>
     </main>
   )
 }
 
-function App() {
-  const [preLoginView, setPreLoginView] = useState<PreLoginView>('landing')
-  const {
-    demoAccounts,
-    error,
-    isAuthenticated,
-    isSubmitting,
-    login,
-    logout,
-    user,
-  } = useTempAuth()
+const corporateLoginCopy = {
+  buttonLabel: 'Continuar con cuenta corporativa',
+  description:
+    'Usaremos tu sesion activa de Google Workspace para validar el acceso al panel de Alianzas.',
+  helperText:
+    'No se abre OAuth externo: Apps Script valida tu cuenta y pertenencia al grupo autorizado.',
+  title: 'Validar acceso corporativo',
+}
 
-  const handleLogout = () => {
-    logout()
-    setPreLoginView('landing')
+function SessionApp({
+  onBackToLanding,
+  onLogout,
+  onRetrySession,
+}: {
+  onBackToLanding: () => void
+  onLogout: () => void
+  onRetrySession: () => Promise<void>
+}) {
+  const { error, isAuthenticated, isLoading, user } = useSessionContext()
+
+  if (isLoading) {
+    return <SessionGate error={error} isLoading={isLoading} />
   }
 
   if (!isAuthenticated || !user) {
-    if (preLoginView === 'landing') {
-      return (
-        <LandingPage
-          onGetStarted={() => setPreLoginView('login')}
-          onSignIn={() => setPreLoginView('login')}
-        />
-      )
-    }
-
     return (
       <LoginScreen
-        demoAccounts={demoAccounts}
+        {...corporateLoginCopy}
         error={error}
-        isSubmitting={isSubmitting}
-        onBackToLanding={() => setPreLoginView('landing')}
-        onLogin={login}
+        isGoogleLoginConfigured
+        onBackToLanding={onBackToLanding}
+        onGoogleLogin={onRetrySession}
       />
     )
   }
 
-  return <AuthenticatedApp onLogout={handleLogout} user={user} />
+  return <AuthenticatedApp onLogout={onLogout} user={user} />
+}
+
+function App() {
+  const [authView, setAuthView] = useState<AuthView>('landing')
+  const [sessionAttempt, setSessionAttempt] = useState(0)
+
+  const showLogin = () => {
+    setAuthView('login')
+  }
+
+  const startSessionValidation = async () => {
+    setSessionAttempt((currentAttempt) => currentAttempt + 1)
+    setAuthView('session')
+  }
+
+  const backToLanding = () => {
+    setAuthView('landing')
+  }
+
+  const logoutToLanding = () => {
+    setSessionAttempt((currentAttempt) => currentAttempt + 1)
+    setAuthView('landing')
+  }
+
+  if (authView === 'landing') {
+    return <LandingPage onGetStarted={showLogin} onSignIn={showLogin} />
+  }
+
+  if (authView === 'login') {
+    return (
+      <LoginScreen
+        {...corporateLoginCopy}
+        isGoogleLoginConfigured
+        onBackToLanding={backToLanding}
+        onGoogleLogin={startSessionValidation}
+      />
+    )
+  }
+
+  return (
+    <SessionApp
+      key={sessionAttempt}
+      onBackToLanding={backToLanding}
+      onLogout={logoutToLanding}
+      onRetrySession={startSessionValidation}
+    />
+  )
 }
 
 export default App

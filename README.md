@@ -1,116 +1,64 @@
 # Loyalty Pagos
 
-Aplicacion MERN para carga y monitoreo de pagos pendientes entre Aliados y Administradores de Alianzas.
+Panel operativo para seguimiento de deuda, cuotas y pagos de aliados.
 
-## Frontend
+## Arquitectura actual
+
+- Frontend: React + Vite.
+- Backend objetivo: Google Apps Script como web app.
+- Control de acceso: Google Workspace + pertenencia a grupo usando `Session.getActiveUser()` y `GroupsApp`.
+
+## Desarrollo local
+
+Para trabajar la UI en local:
 
 ```bash
+npm install
 npm run dev
 ```
 
-## Backend
+La app local usa un backend mock en memoria cuando no existe `google.script.run`, para que puedas seguir iterando el front sin depender del despliegue en Apps Script.
 
-La base del backend vive en `server/` e incluye Express, TypeScript, modelos iniciales, health check y un modo seguro temporal sin MongoDB.
+## Build para Apps Script
 
-Para instalar dependencias del backend:
-
-```bash
-npm install --prefix server
-```
-
-Configura variables:
+Genera el build de React e incrusta los assets compilados dentro de [apps-script/Index.html](/Users/alvaro.arambulo/Documents/React-loyalty-facturas-project/apps-script/Index.html):
 
 ```bash
-cp server/.env.example server/.env
+npm run build:appscript
 ```
 
-Levantar API:
+Ese comando:
 
-```bash
-npm run server:dev
-```
+1. Ejecuta `vite build`.
+2. Lee `dist/index.html` y sus assets.
+3. Genera `apps-script/Index.html` listo para `HtmlService`.
 
-Por defecto corre en modo seguro temporal:
+## Carpeta `apps-script/`
 
-- Escucha solo en `127.0.0.1`.
-- No conecta MongoDB.
-- Guarda pagos en memoria.
-- No guarda imagenes en disco.
-- Valida imagenes con limite de 5MB y tipos `PNG`, `JPG`, `WEBP`.
-- Devuelve una URL placeholder para `url_imagen`.
+- [apps-script/Code.gs](/Users/alvaro.arambulo/Documents/React-loyalty-facturas-project/apps-script/Code.gs): `doGet`, control de acceso por grupo y funciones backend.
+- [apps-script/Index.html](/Users/alvaro.arambulo/Documents/React-loyalty-facturas-project/apps-script/Index.html): build compilado de React servido por Apps Script.
+- [apps-script/AccessDenied.html](/Users/alvaro.arambulo/Documents/React-loyalty-facturas-project/apps-script/AccessDenied.html): pantalla de acceso denegado.
+- [apps-script/appsscript.json](/Users/alvaro.arambulo/Documents/React-loyalty-facturas-project/apps-script/appsscript.json): manifiesto del proyecto Apps Script.
 
-Health check:
+## Estado actual del backend Apps Script
 
-```bash
-GET http://127.0.0.1:3000/api/health
-```
+La estructura ya queda lista para:
 
-Modelos iniciales:
+- validar usuarios por grupo corporativo;
+- entregar la SPA de React desde Apps Script;
+- llamar funciones de backend desde React usando `google.script.run`.
 
-- `User`: usuarios con roles `Aliado` o `Alianzas`.
-- `Invoice`: pagos con comercio, monto, evidencia, estado y aliado.
-- `Commerce`: catalogo simple de comercios.
+Hoy [apps-script/Code.gs](/Users/alvaro.arambulo/Documents/React-loyalty-facturas-project/apps-script/Code.gs) trae datos mock para `listarAliados` y `obtenerDetalleAliado`, y deja `registrarPago` marcado para conectar con tu hoja/base real.
 
-Endpoints temporales:
+## Siguiente paso productivo
 
-- `GET /api/invoices`
-- `POST /api/invoices`
-- `PATCH /api/invoices/:invoiceId/verify`
-- `PATCH /api/invoices/:invoiceId/reject`
-- `POST /api/payments/import`
+Mapear en Apps Script las funciones reales:
 
-## Variables Para Deploy
+- `listarAliados`
+- `obtenerDetalleAliado`
+- `registrarPago`
 
-### Frontend en Vercel
-
-Como ahora usamos Vercel Functions en el mismo proyecto, puedes dejar el frontend apuntando a la API del mismo dominio:
-
-```bash
-VITE_API_URL=/api
-```
-
-Tambien puedes omitir `VITE_API_URL`, porque el frontend usa `/api` por defecto.
-
-Agrega estas variables secretas en `Project Settings > Environment Variables`:
-
-```bash
-MONGODB_URI=mongodb+srv://loyalty_app_user:<URL_ENCODED_PASSWORD>@loyalty-pagos-dev.n3peaqd.mongodb.net/loyalty_pagos?retryWrites=true&w=majority&appName=loyalty-pagos-dev
-CLIENT_ORIGINS=https://julianxloyalty.vercel.app,http://127.0.0.1:5173,http://localhost:5173
-```
-
-No uses `http://127.0.0.1:3000/api` en Vercel, porque esa URL solo funciona en tu computadora.
-
-### API en Vercel Functions
-
-La carpeta `api/` contiene endpoints serverless para la demo:
-
-- `GET /api/health`
-- `GET /api/invoices`
-- `POST /api/invoices`
-- `PATCH /api/invoices/:invoiceId/verify`
-- `PATCH /api/invoices/:invoiceId/reject`
-- `POST /api/payments/import`
-
-En esta demo las evidencias y archivos Excel no se almacenan; se guarda metadata y una URL placeholder.
-
-### Backend
-
-Cuando el backend este deployado, usa variables como estas:
-
-```bash
-PORT=3000
-HOST=0.0.0.0
-USE_MOCK_DB=false
-MONGODB_URI=mongodb+srv://loyalty_app_user:<URL_ENCODED_PASSWORD>@loyalty-pagos-dev.n3peaqd.mongodb.net/loyalty_pagos?retryWrites=true&w=majority&appName=loyalty-pagos-dev
-CLIENT_ORIGINS=https://julianxloyalty.vercel.app,http://127.0.0.1:5173,http://localhost:5173
-```
-
-En local puedes mantener:
-
-```bash
-HOST=127.0.0.1
-VITE_API_URL=http://127.0.0.1:3000/api
-```
+contra las hojas, tablas o fuentes definitivas del negocio.
 
 # React + TypeScript + Vite
 

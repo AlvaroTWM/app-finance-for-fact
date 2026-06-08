@@ -6,7 +6,7 @@ import { Button } from '../ui/Button'
 import { importPendingPayments } from '../../services/payments'
 import type { PendingPaymentImportResult } from '../../types/payment'
 
-const acceptedExtensions = '.xlsx,.xls,.csv'
+const acceptedExtensions = '.xlsx,.csv'
 
 function getFriendlyImportError(error: unknown) {
   if (error instanceof Error && error.message !== 'Network Error') {
@@ -70,8 +70,9 @@ export function PendingPaymentsImport() {
               Importa pagos pendientes
             </h2>
             <p className="mt-2 max-w-2xl text-sm font-medium leading-6 text-slate-500">
-              Sube un Excel con las columnas <strong>mes</strong>, <strong>nom_aliado</strong> y{' '}
-              <strong>monto_total</strong>. Por ahora el archivo se valida en memoria y no se guarda.
+              Sube un Excel con las columnas <strong>MES</strong>, <strong>ALIADO</strong> y{' '}
+              <strong>MONTO_PAGAR</strong>. Tambien aceptamos equivalentes como nom_aliado o
+              monto_total.
             </p>
           </div>
         </div>
@@ -80,7 +81,7 @@ export function PendingPaymentsImport() {
           <label className="interactive-lift flex cursor-pointer items-center gap-3 rounded-2xl border border-dashed border-emerald-950/20 bg-emerald-50/50 px-4 py-3 hover:border-emerald-400 hover:bg-emerald-50">
             <ArrowUpTrayIcon aria-hidden="true" className="size-5 text-emerald-800" />
             <span className="min-w-0 flex-1 truncate text-sm font-bold text-slate-700">
-              {selectedFile ? selectedFile.name : 'Seleccionar Excel o CSV'}
+              {selectedFile ? selectedFile.name : 'Seleccionar XLSX o CSV'}
             </span>
             <input
               ref={inputRef}
@@ -105,7 +106,8 @@ export function PendingPaymentsImport() {
 
       {result ? (
         <div className="animate-soft-pop mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
-          {result.message} Archivo recibido: <strong>{result.filename}</strong>.
+          {result.message} Archivo recibido: <strong>{result.filename}</strong>. Filas validas:{' '}
+          <strong>{result.rowsReceived}</strong>.
         </div>
       ) : null}
     </section>

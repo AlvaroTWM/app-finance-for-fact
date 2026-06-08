@@ -2,9 +2,6 @@ import { randomUUID } from 'node:crypto'
 
 import type { CreateInvoiceInput, InvoiceResponse } from '../types/invoice.js'
 
-const placeholderImageUrl =
-  'https://placehold.co/900x1200/eafff2/064e3b?text=Evidencia+recibida'
-
 let invoices: InvoiceResponse[] = []
 
 function createId() {
@@ -19,13 +16,14 @@ export function createInvoice(input: CreateInvoiceInput) {
   const invoice: InvoiceResponse = {
     aliado_id: input.aliado_id,
     comercio: input.comercio,
-    comentarios: ['Imagen validada en memoria. No se almaceno ningun archivo.'],
+    comentarios:
+      input.comentarios ?? ['Evidencia recibida y almacenada localmente para revision.'],
     estado: 'Pendiente',
     fecha_subida: new Date().toISOString(),
     id: createId(),
     monto: input.monto,
     nro_factura: input.nro_factura,
-    url_imagen: placeholderImageUrl,
+    url_imagen: input.url_imagen,
   }
 
   invoices = [invoice, ...invoices]

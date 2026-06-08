@@ -1,5 +1,4 @@
 import {
-  ChartBarIcon,
   ChevronDownIcon,
   Cog6ToothIcon,
   Squares2X2Icon,
@@ -21,11 +20,6 @@ const benefits = [
     icon: Squares2X2Icon,
     title: 'Monitoreo unificado',
   },
-  {
-    description: 'Informacion detallada para mejores decisiones.',
-    icon: ChartBarIcon,
-    title: 'Reportes claros',
-  },
 ]
 
 export function LandingPage({ onGetStarted, onSignIn }: LandingPageProps) {
@@ -42,16 +36,13 @@ export function LandingPage({ onGetStarted, onSignIn }: LandingPageProps) {
           </span>
           <span className="text-sm font-black tracking-[0.24em]">LOYALTY</span>
         </button>
-
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={onGetStarted}
-            className="interactive-lift rounded-full px-5 py-3 text-sm font-bold text-slate-950 hover:bg-white/65"
-          >
-            Inicia Sesion
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={onGetStarted}
+          className="interactive-lift rounded-full px-5 py-3 text-sm font-bold text-slate-950 hover:bg-white/65"
+        >
+          Inicia Sesion
+        </button>
       </header>
 
       <section className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center gap-10 py-10 text-center">
@@ -69,15 +60,25 @@ export function LandingPage({ onGetStarted, onSignIn }: LandingPageProps) {
               Loyalty HUB
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg font-medium leading-8 text-slate-600">
-              Innovando en cada beneficio, centrados en tu experiencia como aliado ueno+.
+              Gestiona validaciones, seguimiento e importaciones desde el panel del equipo de
+              Alianzas.
             </p>
+            <div className="mt-8 flex items-center justify-center">
+              <button
+                type="button"
+                onClick={onGetStarted}
+                className="interactive-lift rounded-full bg-emerald-500 px-6 py-3 text-sm font-black text-emerald-950 shadow-lg shadow-emerald-500/30 hover:bg-emerald-400"
+              >
+                Iniciar sesion
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="animate-fade-up animate-delay-4 grid w-full max-w-5xl gap-6 border-y border-emerald-950/10 py-7 text-left md:grid-cols-3">
+        <div className="animate-fade-up animate-delay-4 grid w-full max-w-5xl gap-6 border-y border-emerald-950/10 py-7 text-left md:grid-cols-2">
           {benefits.map((benefit, index) => {
             const Icon = benefit.icon
-            const delayClass = ['animate-delay-4', 'animate-delay-5', 'animate-delay-6'][index]
+            const delayClass = ['animate-delay-4', 'animate-delay-5'][index]
 
             return (
               <article

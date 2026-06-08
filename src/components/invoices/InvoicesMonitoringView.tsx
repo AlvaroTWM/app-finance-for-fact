@@ -199,7 +199,6 @@ export function InvoicesMonitoringView({
         isLoading={isLoading}
         onReject={onReject}
         onVerify={onVerify}
-        userRole="Alianzas"
       />
     </section>
   )

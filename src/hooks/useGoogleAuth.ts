@@ -2,30 +2,29 @@ import { useState } from 'react'
 
 import {
   clearStoredSession,
-  demoAccounts,
   getStoredSession,
-  loginWithTempCredentials,
+  isGoogleLoginConfigured,
+  loginWithGoogle,
 } from '../services/auth'
-import type { AuthUser, LoginCredentials } from '../types/auth'
 
-export function useTempAuth() {
-  const [user, setUser] = useState<AuthUser | null>(() => getStoredSession())
+export function useGoogleAuth() {
+  const [user, setUser] = useState(() => getStoredSession())
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const login = async (credentials: LoginCredentials) => {
+  const login = async () => {
     setIsSubmitting(true)
     setError(null)
 
     try {
-      const authenticatedUser = await loginWithTempCredentials(credentials)
+      const authenticatedUser = await loginWithGoogle()
       setUser(authenticatedUser)
       return authenticatedUser
     } catch (loginError) {
       const message =
         loginError instanceof Error
           ? loginError.message
-          : 'No fue posible iniciar sesion.'
+          : 'No fue posible iniciar sesion con Google.'
       setError(message)
       throw new Error(message)
     } finally {
@@ -40,9 +39,9 @@ export function useTempAuth() {
   }
 
   return {
-    demoAccounts,
     error,
     isAuthenticated: Boolean(user),
+    isGoogleLoginConfigured: isGoogleLoginConfigured(),
     isSubmitting,
     login,
     logout,

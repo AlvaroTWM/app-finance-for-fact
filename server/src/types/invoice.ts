@@ -17,6 +17,8 @@ export interface InvoiceResponse {
 export interface CreateInvoiceInput {
   aliado_id: string
   comercio: string
+  comentarios?: string[]
   monto: number
   nro_factura: string
+  url_imagen: string
 }

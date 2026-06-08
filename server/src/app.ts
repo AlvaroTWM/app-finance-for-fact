@@ -5,6 +5,7 @@ import { env } from './config/env.js'
 import { errorHandler } from './middlewares/errorHandler.js'
 import { notFound } from './middlewares/notFound.js'
 import { apiRouter } from './routes/index.js'
+import { getUploadsRootDir } from './services/localFileStorage.js'
 
 export const app = express()
 
@@ -21,6 +22,7 @@ app.use(
   }),
 )
 app.use(express.json())
+app.use('/uploads', express.static(getUploadsRootDir()))
 
 app.use('/api', apiRouter)
 

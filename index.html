@@ -11,6 +11,13 @@
       rel="stylesheet"
     />
     <title>react-loyalty-facturas-project</title>
+    <script>
+      (function () {
+        if (localStorage.getItem('loyalty-theme') === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -2,9 +2,7 @@ export const invoiceStatuses = ['Pendiente', 'Verificado', 'Rechazado'] as const
 
 export type InvoiceStatus = (typeof invoiceStatuses)[number]
 
-export type UserRole = 'Aliado' | 'Alianzas'
-
-export type InvoiceFilter = 'all' | 'pending' | 'mine'
+export type UserRole = 'Alianzas'
 
 export interface Invoice {
   id: string

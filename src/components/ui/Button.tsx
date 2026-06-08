@@ -11,9 +11,9 @@ const variants: Record<ButtonVariant, string> = {
   primary:
     'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/30 hover:bg-emerald-400 focus-visible:outline-emerald-500',
   secondary:
-    'bg-slate-950 text-white hover:bg-slate-800 focus-visible:outline-slate-950',
+    'bg-slate-950 text-white hover:bg-slate-800 focus-visible:outline-slate-950 dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white',
   ghost:
-    'bg-transparent text-slate-700 hover:bg-slate-100 focus-visible:outline-slate-400',
+    'bg-transparent text-slate-700 hover:bg-slate-100 focus-visible:outline-slate-400 dark:text-slate-300 dark:hover:bg-slate-800',
 }
 
 export function Button({
