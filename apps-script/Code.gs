@@ -17,7 +17,7 @@ var HEADERS_DEUDAS = [
   'deuda_id', 'aliado_id', 'tipo_pago',
   'monto_total_deuda', 'monto_total_pagado', 'saldo_pendiente',
   'estado_deuda', 'fecha_compromiso', 'fecha_pago', 'observaciones',
-  'cantidad_cuotas', 'brand', 'ruc', 'periodo', 'num_factura', 'servicio'
+  'cantidad_cuotas', 'bolsa', 'brand', 'ruc', 'periodo', 'num_factura', 'servicio'
 ];
 
 var HEADERS_CUOTAS = [
@@ -35,29 +35,79 @@ var HEADERS_PAGOS = [
 // ============================================================
 
 var MOCK_ALIADOS_DATA = [
-  { aliado_id: 'A-001', nombre_aliado: 'Comercial San Miguel', ruc: '80012345-1', estado: 'activo' },
-  { aliado_id: 'A-002', nombre_aliado: 'Farmacia Primavera',   ruc: '80023456-2', estado: 'activo' },
-  { aliado_id: 'A-003', nombre_aliado: 'Estacion Central',     ruc: '80034567-3', estado: 'activo' }
+  { aliado_id: 'A-001', nombre_aliado: 'Maxifarma Encarnacion', ruc: '80012345-1', estado: 'activo' },
+  { aliado_id: 'A-002', nombre_aliado: 'Bacon',                 ruc: '80023456-2', estado: 'activo' },
+  { aliado_id: 'A-003', nombre_aliado: 'Starbucks',             ruc: '80034567-3', estado: 'activo' },
+  { aliado_id: 'A-004', nombre_aliado: 'Burguer King',          ruc: '80045678-4', estado: 'activo' },
+  { aliado_id: 'A-005', nombre_aliado: 'Pizza Hut',             ruc: '80056789-5', estado: 'activo' },
+  { aliado_id: 'A-006', nombre_aliado: 'Don Vito',              ruc: '80067890-6', estado: 'activo' },
+  { aliado_id: 'A-007', nombre_aliado: 'Lomy',                  ruc: '80078901-7', estado: 'activo' }
 ];
 
 var MOCK_DEUDAS_DATA = [
   {
-    aliado_id: 'A-001', cantidad_cuotas: 3, deuda_id: 'D-1001', estado_deuda: 'parcial',
+    aliado_id: 'A-001', bolsa: 'FARMACIAS', brand: 'MAXIFARMA ENCARNACION',
+    cantidad_cuotas: 3, deuda_id: 'D-1001', estado_deuda: 'parcial',
     fecha_compromiso: '2026-04-12', fecha_pago: '', monto_total_deuda: 4500000,
-    monto_total_pagado: 1500000, observaciones: 'Plan especial de abril.',
-    saldo_pendiente: 3000000, tipo_pago: 'cuotas'
+    monto_total_pagado: 1500000, num_factura: 'FAC-0042', observaciones: 'Plan especial de abril.',
+    periodo: 'Abril 2026', ruc: '80012345-1', saldo_pendiente: 3000000,
+    servicio: 'Publicidad digital', tipo_pago: 'cuotas'
   },
   {
-    aliado_id: 'A-002', cantidad_cuotas: 2, deuda_id: 'D-1002', estado_deuda: 'pendiente',
+    aliado_id: 'A-001', bolsa: 'FARMACIAS', brand: 'MAXIFARMA ENCARNACION',
+    cantidad_cuotas: 1, deuda_id: 'D-1007', estado_deuda: 'pagado',
+    fecha_compromiso: '2026-03-01', fecha_pago: '2026-03-31', monto_total_deuda: 800000,
+    monto_total_pagado: 800000, num_factura: 'FAC-0031', observaciones: 'Servicio de marzo cancelado.',
+    periodo: 'Marzo 2026', ruc: '80012345-1', saldo_pendiente: 0,
+    servicio: 'Publicidad digital', tipo_pago: 'unico'
+  },
+  {
+    aliado_id: 'A-002', bolsa: 'GASTRONOMIA', brand: 'BACON',
+    cantidad_cuotas: 2, deuda_id: 'D-1002', estado_deuda: 'pendiente',
     fecha_compromiso: '2026-05-05', fecha_pago: '', monto_total_deuda: 1800000,
-    monto_total_pagado: 0, observaciones: 'Pendiente de primer pago.',
-    saldo_pendiente: 1800000, tipo_pago: 'cuotas'
+    monto_total_pagado: 0, num_factura: 'FAC-0058', observaciones: 'Pendiente de primer pago.',
+    periodo: 'Mayo 2026', ruc: '80023456-2', saldo_pendiente: 1800000,
+    servicio: 'Publicidad digital', tipo_pago: 'cuotas'
   },
   {
-    aliado_id: 'A-003', cantidad_cuotas: 1, deuda_id: 'D-1003', estado_deuda: 'pendiente',
+    aliado_id: 'A-003', bolsa: 'LUNES DE STARBUCKS', brand: 'STARBUCKS',
+    cantidad_cuotas: 1, deuda_id: 'D-1003', estado_deuda: 'pendiente',
     fecha_compromiso: '2026-05-20', fecha_pago: '2026-06-30', monto_total_deuda: 2200000,
-    monto_total_pagado: 0, observaciones: 'Pago unico acordado.',
-    saldo_pendiente: 2200000, tipo_pago: 'unico'
+    monto_total_pagado: 0, num_factura: 'FAC-0071', observaciones: 'Pago unico acordado.',
+    periodo: 'Mayo 2026', ruc: '80034567-3', saldo_pendiente: 2200000,
+    servicio: 'Publicidad digital', tipo_pago: 'unico'
+  },
+  {
+    aliado_id: 'A-004', bolsa: 'MARTES DE BURGUER KING', brand: 'BURGUER KING',
+    cantidad_cuotas: 4, deuda_id: 'D-1004', estado_deuda: 'parcial',
+    fecha_compromiso: '2026-03-15', fecha_pago: '', monto_total_deuda: 6000000,
+    monto_total_pagado: 3000000, num_factura: 'FAC-0085', observaciones: 'Acuerdo trimestral. Mitad abonada.',
+    periodo: 'Marzo-Junio 2026', ruc: '80045678-4', saldo_pendiente: 3000000,
+    servicio: 'Publicidad digital', tipo_pago: 'cuotas'
+  },
+  {
+    aliado_id: 'A-005', bolsa: 'MIERCOLES DE PIZZA HUT', brand: 'PIZZA HUT',
+    cantidad_cuotas: 3, deuda_id: 'D-1005', estado_deuda: 'pendiente',
+    fecha_compromiso: '2026-06-01', fecha_pago: '', monto_total_deuda: 9000000,
+    monto_total_pagado: 0, num_factura: 'FAC-0099', observaciones: 'Primer acuerdo del aliado. Sin pagos aun.',
+    periodo: 'Junio 2026', ruc: '80056789-5', saldo_pendiente: 9000000,
+    servicio: 'Publicidad digital', tipo_pago: 'cuotas'
+  },
+  {
+    aliado_id: 'A-006', bolsa: 'JUEVES DE DON VITO', brand: 'DON VITO',
+    cantidad_cuotas: 2, deuda_id: 'D-1006', estado_deuda: 'pendiente',
+    fecha_compromiso: '2026-05-01', fecha_pago: '', monto_total_deuda: 3500000,
+    monto_total_pagado: 0, num_factura: 'FAC-0022', observaciones: 'Acuerdo reciente. Sin pagos registrados.',
+    periodo: 'Mayo 2026', ruc: '80067890-6', saldo_pendiente: 3500000,
+    servicio: 'Publicidad digital', tipo_pago: 'cuotas'
+  },
+  {
+    aliado_id: 'A-007', bolsa: 'VIERNES DE LOMY', brand: 'LOMY',
+    cantidad_cuotas: 2, deuda_id: 'D-1008', estado_deuda: 'parcial',
+    fecha_compromiso: '2026-04-01', fecha_pago: '', monto_total_deuda: 2600000,
+    monto_total_pagado: 600000, num_factura: 'FAC-0110', observaciones: 'Primera cuota abonada parcialmente.',
+    periodo: 'Abril-Mayo 2026', ruc: '80078901-7', saldo_pendiente: 2000000,
+    servicio: 'Publicidad digital', tipo_pago: 'cuotas'
   }
 ];
 
@@ -65,8 +115,21 @@ var MOCK_CUOTAS_DATA = [
   { cuota_id: 'C-2001', deuda_id: 'D-1001', estado_cuota: 'pagada',   fecha_vencimiento: '2026-05-01', monto_cuota: 1500000, monto_pagado: 1500000, numero_cuota: 1 },
   { cuota_id: 'C-2002', deuda_id: 'D-1001', estado_cuota: 'pendiente', fecha_vencimiento: '2026-06-01', monto_cuota: 1500000, monto_pagado: 0,       numero_cuota: 2 },
   { cuota_id: 'C-2003', deuda_id: 'D-1001', estado_cuota: 'pendiente', fecha_vencimiento: '2026-07-01', monto_cuota: 1500000, monto_pagado: 0,       numero_cuota: 3 },
+  { cuota_id: 'C-2011', deuda_id: 'D-1007', estado_cuota: 'pagada',   fecha_vencimiento: '2026-03-31', monto_cuota: 800000,  monto_pagado: 800000,  numero_cuota: 1 },
   { cuota_id: 'C-2004', deuda_id: 'D-1002', estado_cuota: 'pendiente', fecha_vencimiento: '2026-06-15', monto_cuota: 900000,  monto_pagado: 0,       numero_cuota: 1 },
-  { cuota_id: 'C-2005', deuda_id: 'D-1002', estado_cuota: 'pendiente', fecha_vencimiento: '2026-07-15', monto_cuota: 900000,  monto_pagado: 0,       numero_cuota: 2 }
+  { cuota_id: 'C-2005', deuda_id: 'D-1002', estado_cuota: 'pendiente', fecha_vencimiento: '2026-07-15', monto_cuota: 900000,  monto_pagado: 0,       numero_cuota: 2 },
+  { cuota_id: 'C-2006', deuda_id: 'D-1003', estado_cuota: 'pendiente', fecha_vencimiento: '2026-06-30', monto_cuota: 2200000, monto_pagado: 0,       numero_cuota: 1 },
+  { cuota_id: 'C-2007', deuda_id: 'D-1004', estado_cuota: 'pagada',   fecha_vencimiento: '2026-04-01', monto_cuota: 1500000, monto_pagado: 1500000, numero_cuota: 1 },
+  { cuota_id: 'C-2008', deuda_id: 'D-1004', estado_cuota: 'pagada',   fecha_vencimiento: '2026-05-01', monto_cuota: 1500000, monto_pagado: 1500000, numero_cuota: 2 },
+  { cuota_id: 'C-2009', deuda_id: 'D-1004', estado_cuota: 'pendiente', fecha_vencimiento: '2026-06-01', monto_cuota: 1500000, monto_pagado: 0,       numero_cuota: 3 },
+  { cuota_id: 'C-2010', deuda_id: 'D-1004', estado_cuota: 'pendiente', fecha_vencimiento: '2026-07-01', monto_cuota: 1500000, monto_pagado: 0,       numero_cuota: 4 },
+  { cuota_id: 'C-2012', deuda_id: 'D-1005', estado_cuota: 'pendiente', fecha_vencimiento: '2026-07-01', monto_cuota: 3000000, monto_pagado: 0,       numero_cuota: 1 },
+  { cuota_id: 'C-2013', deuda_id: 'D-1005', estado_cuota: 'pendiente', fecha_vencimiento: '2026-08-01', monto_cuota: 3000000, monto_pagado: 0,       numero_cuota: 2 },
+  { cuota_id: 'C-2014', deuda_id: 'D-1005', estado_cuota: 'pendiente', fecha_vencimiento: '2026-09-01', monto_cuota: 3000000, monto_pagado: 0,       numero_cuota: 3 },
+  { cuota_id: 'C-2015', deuda_id: 'D-1006', estado_cuota: 'pendiente', fecha_vencimiento: '2026-06-15', monto_cuota: 1750000, monto_pagado: 0,       numero_cuota: 1 },
+  { cuota_id: 'C-2016', deuda_id: 'D-1006', estado_cuota: 'pendiente', fecha_vencimiento: '2026-07-15', monto_cuota: 1750000, monto_pagado: 0,       numero_cuota: 2 },
+  { cuota_id: 'C-2017', deuda_id: 'D-1008', estado_cuota: 'parcial',   fecha_vencimiento: '2026-05-01', monto_cuota: 1300000, monto_pagado: 600000,  numero_cuota: 1 },
+  { cuota_id: 'C-2018', deuda_id: 'D-1008', estado_cuota: 'pendiente', fecha_vencimiento: '2026-06-01', monto_cuota: 1300000, monto_pagado: 0,       numero_cuota: 2 }
 ];
 
 var MOCK_PAGOS_DATA = [
@@ -229,14 +292,19 @@ function computeEstadoGeneral_(saldo, total) {
 
 function buildAllySummary_(aliado, deudas) {
   var resumen = computeResumen_(deudas);
+  var activa = deudas.filter(function(d) { return d.estado_deuda !== 'pagado'; })[0] || deudas[0];
   return {
-    aliado_id: aliado.aliado_id,
-    deuda_total: resumen.deuda_total,
-    estado: aliado.estado,
-    estado_general: computeEstadoGeneral_(resumen.saldo_pendiente, resumen.deuda_total),
+    aliado_id:          aliado.aliado_id,
+    bolsa:              activa ? (activa.bolsa  || '') : '',
+    brand:              activa ? (activa.brand  || '') : '',
+    deuda_total:        resumen.deuda_total,
+    estado:             aliado.estado,
+    estado_general:     computeEstadoGeneral_(resumen.saldo_pendiente, resumen.deuda_total),
     monto_total_pagado: resumen.monto_total_pagado,
-    nombre_aliado: aliado.nombre_aliado,
-    saldo_pendiente: resumen.saldo_pendiente
+    nombre_aliado:      aliado.nombre_aliado,
+    ruc:                activa ? (activa.ruc    || '') : '',
+    saldo_pendiente:    resumen.saldo_pendiente,
+    ultimo_periodo:     activa ? (activa.periodo || '') : ''
   };
 }
 
@@ -372,6 +440,7 @@ function crearAcuerdo(payload) {
   var sheetDeudas = getOrCreateSheet_(SHEET_DEUDAS, HEADERS_DEUDAS);
   appendRow_(sheetDeudas, HEADERS_DEUDAS, {
     aliado_id:          payload.aliadoId,
+    bolsa:              payload.bolsa || '',
     brand:              payload.brand || '',
     cantidad_cuotas:    cantidadCuotas,
     deuda_id:           deudaId,

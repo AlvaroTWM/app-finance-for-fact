@@ -70,6 +70,13 @@ async function buildAppsScriptHtml() {
       rel="stylesheet"
     />
     <title>${title}</title>
+    <script>
+      (function () {
+        if (localStorage.getItem('loyalty-theme') === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root">
